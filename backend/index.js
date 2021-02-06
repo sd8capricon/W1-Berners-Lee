@@ -9,6 +9,7 @@ const insuranceRoutes = require('./routes/insuranceRoutes');
 
 const PORT = process.env.PORT || 5000;
 const app = express();
+//i know cors is enable for all web ik its dumb
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
