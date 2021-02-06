@@ -7,29 +7,38 @@ router.post('/register', async(req, res)=>{
     const username = req.body.username;
     const initialPassword = req.body.password;
     const saltRounds = 10;
-    bcrypt.genSalt(saltRounds, function(err, salt) {
-        bcrypt.hash(initialPassword, salt, function(err, hashPass) {
-            console.log(hash);
-            const user = new User({
-                username: username,
-                password: hashPass
+    if(initialPassword.length >= 6){
+        bcrypt.genSalt(saltRounds, function(err, salt) {
+            bcrypt.hash(initialPassword, salt, function(err, hashPass) {
+                const user = new User({
+                    username: username,
+                    password: hashPass
+                });
+                user.save((err, result)=>{
+                    if(err){
+                        console.log(err);
+                        res.status(200).json({
+                            message: 'could not regsiter try again',
+                            error: err.message
+                        })
+                    }
+                    else if(result){
+                        console.log(result);
+                        res.status(200).json({
+                            message: 'user saved',
+                        })
+                    }
+                }); 
             });
-            user.save((err, result)=>{
-                if(err){
-                    console.log(err);
-                    res.status(200).json({
-                        message: 'could not regsiter try again',
-                    })
-                }
-                else if(result){
-                    console.log(result);
-                    res.status(200).json({
-                        message: 'user saved',
-                    })
-                }
-            }); 
         });
-    });
+    }
+    else{
+        res.status(200).json({
+            message: 'could not regsiter try again',
+            error: "password length should be greater than or equal to 6"
+        })
+    }
+    
 })
 
 router.post('/login', (req, res)=>{
