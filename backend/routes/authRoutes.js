@@ -57,7 +57,7 @@ router.post('/login', (req, res)=>{
     User.findOne({ username: username }, (err, user)=>{
         if(user){
             bcrypt.compare(password, user.password, (err, result)=>{
-                if(!err){
+                if(result){
                     console.log(result);
                     const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn:'3h' });
                     res.status(200).json({
