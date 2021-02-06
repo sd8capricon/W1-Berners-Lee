@@ -3,53 +3,63 @@ const bcrypt = require('bcrypt');
 const User = require('../models/userModel');
 const router = require('express').Router();
 
-router.post('/register', (req, res)=>{
+router.post('/register', async(req, res)=>{
     const username = req.body.username;
-    const password = req.body.password;
-    const user = new User({
-        username: username,
-        password: password
-    });
-    user.save((err, result)=>{
-        if(err){
-            console.log(err);
-            res.status(200).json({
-                message: 'could not regsiter try again',
+    const initialPassword = req.body.password;
+    const saltRounds = 10;
+    bcrypt.genSalt(saltRounds, function(err, salt) {
+        bcrypt.hash(initialPassword, salt, function(err, hashPass) {
+            console.log(hash);
+            const user = new User({
+                username: username,
+                password: hashPass
             });
-        }
-        else if(result){
-            console.log(result);
-            res.status(200).json({
-                message: 'user saved',
-            });
-        }
+            user.save((err, result)=>{
+                if(err){
+                    console.log(err);
+                    res.status(200).json({
+                        message: 'could not regsiter try again',
+                    })
+                }
+                else if(result){
+                    console.log(result);
+                    res.status(200).json({
+                        message: 'user saved',
+                    })
+                }
+            }); 
+        });
     });
 })
 
 router.post('/login', (req, res)=>{
     const username = req.body.username;
     const password = req.body.password;
-    console.log('body '+password);
+    console.log(username);
     User.findOne({ username: username }, (err, user)=>{
         if(user){
-            console.log(user.password);
-            if(user.password === password){
-                const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn:'1h' });
-                res.json({
-                    message: 'User Authentication Successful',
-                    authenticated: true,
-                    token: token
-                });
-            }
-            else{
-                res.json({
-                    message: 'User Authentication Failed',
-                    authenticated: false,
-                    error: 'Incorrect Password'
-                });
-            }
+            bcrypt.compare(password, user.password, (err, result)=>{
+                if(!err){
+                    console.log(result);
+                    const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn:'1h' });
+                    res.json({
+                        message: 'User Authentication Successful',
+                        authenticated: true,
+                        token: token
+                    });
+                }
+                else{
+                    console.log(err);
+                    res.json({
+                        message: 'User Authentication Failed',
+                        authenticated: false,
+                        error: 'Incorrect Password'
+                    });
+                }
+            });
         }
         else{
+            console.log(err);
             res.json({
                 message: 'User Authentication Failed',
                 authenticated: false,
