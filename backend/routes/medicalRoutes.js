@@ -7,7 +7,11 @@ router.post('/status', (req, res)=>{
         if(!err){
             res.status(200).json({
                 username: user.username,
-                medicalHistory: user.medicalHistory
+                cancer: user.medicalHistory.cancer,
+                heartAttack: user.medicalHistory.heartAttack,
+                diabetes: user.medicalHistory.diabetes,
+                bloodPressure: user.medicalHistory.bloodPressure,
+                covid: user.medicalHistory.covid
             });
         }
         else{
