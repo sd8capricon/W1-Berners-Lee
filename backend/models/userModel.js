@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'input password'],
     },
-    mediacalHistory:{
+    medicalHistory:{
         cancer: false,
         heartAttack: false,
         diabetes: false,

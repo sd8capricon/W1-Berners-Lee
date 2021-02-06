@@ -13,7 +13,7 @@ router.post('/register', async(req, res)=>{
                 const user = new User({
                     username: username,
                     password: hashPass,
-                    mediacalHistory:{
+                    medicalHistory:{
                         cancer: false,
                         heartAttack: false,
                         diabetes: false,
