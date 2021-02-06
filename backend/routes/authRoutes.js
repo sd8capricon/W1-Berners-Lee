@@ -12,7 +12,16 @@ router.post('/register', async(req, res)=>{
             bcrypt.hash(initialPassword, salt, function(err, hashPass) {
                 const user = new User({
                     username: username,
-                    password: hashPass
+                    password: hashPass,
+                    mediacalHistory:{
+                        cancer: false,
+                        heartAttack: false,
+                        diabetes: false,
+                        bloodPressure: false,
+                        covid: false
+                    },
+                    gameAttempted: false,
+                    gameScore: 0
                 });
                 user.save((err, result)=>{
                     if(err){
@@ -50,8 +59,8 @@ router.post('/login', (req, res)=>{
             bcrypt.compare(password, user.password, (err, result)=>{
                 if(!err){
                     console.log(result);
-                    const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn:'1h' });
-                    res.json({
+                    const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn:'3h' });
+                    res.status(200).json({
                         message: 'User Authentication Successful',
                         authenticated: true,
                         token: token
@@ -59,7 +68,7 @@ router.post('/login', (req, res)=>{
                 }
                 else{
                     console.log(err);
-                    res.json({
+                    res.status(200).json({
                         message: 'User Authentication Failed',
                         authenticated: false,
                         error: 'Incorrect Password'
@@ -69,7 +78,7 @@ router.post('/login', (req, res)=>{
         }
         else{
             console.log(err);
-            res.json({
+            res.status(200).json({
                 message: 'User Authentication Failed',
                 authenticated: false,
                 error: 'Incorrect Credentials'
